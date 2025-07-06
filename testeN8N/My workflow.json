@@ -1,0 +1,214 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.pergunta }}",
+        "options": {
+          "systemMessage": "Você é um Gerador de Animações CSS.\n\nSempre responda com um JSON válido com esta estrutura:\n\n{\n  \"code\": \"HTML com <span class='selector/property/value'>...</span>\",\n  \"preview\": \"<div class='nome'></div>\",\n  \"style\": \"CSS puro\"\n}\n\n⚠️ REGRAS:\n- A resposta deve conter SOMENTE esse JSON (sem explicações).\n- Não use quebras de linha. Tudo deve vir em uma única linha.\n- Use aspas simples dentro das strings e aspas duplas fora.\n- O conteúdo do campo \"code\" deve conter os spans de formatação: .selector / .property / .value\n- A animação deve ser colorida, visualmente marcante e com código simples.\n\nEXEMPLO de saída desejada (bola pulando):\n\n{\"code\":\"<span class='selector'>.bola</span> { <span class='property'>width</span>: <span class='value'>80px</span>; <span class='property'>height</span>: <span class='value'>80px</span>; <span class='property'>background</span>: <span class='value'>radial-gradient(#4fc3f7, #1976d2)</span>; <span class='property'>border-radius</span>: <span class='value'>50%</span>; <span class='property'>animation</span>: <span class='value'>pular 1s infinite</span>; } <span class='selector'>@keyframes</span> <span class='value'>pular</span> { <span class='property'>0%</span> { <span class='property'>transform</span>: <span class='value'>translateY(0)</span>; } <span class='property'>50%</span> { <span class='property'>transform</span>: <span class='value'>translateY(-100px)</span>; } <span class='property'>100%</span> { <span class='property'>transform</span>: <span class='value'>translateY(0)</span>; } }\",\"preview\":\"<div class='bola'></div>\",\"style\":\".bola { width: 80px; height: 80px; background: radial-gradient(#4fc3f7, #1976d2); border-radius: 50%; animation: pular 1s infinite; } @keyframes pular { 0% { transform: translateY(0); } 50% { transform: translateY(-100px); } 100% { transform: translateY(0); } }\"}\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        -460,
+        -60
+      ],
+      "id": "95659338-4a20-49a6-90ca-ede5261be3e1",
+      "name": "AI Agent",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -380,
+        160
+      ],
+      "id": "0bf2823c-1705-45fa-8df4-744b7f16eb1b",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "rsVyo1F2f3Ru6XAP",
+          "name": "Groq account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        380,
+        -60
+      ],
+      "id": "0ac4adec-621b-4c37-96c3-cb333931c692",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "aad0bee4-d203-4853-86b1-e73da61f2d27",
+              "name": "pergunta",
+              "value": "={{ $json.body.pergunta }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -680,
+        -60
+      ],
+      "id": "5e2fcc1e-a1d7-4d9f-942a-87fa56fcb2ff",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "animacao-css",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1000,
+        0
+      ],
+      "id": "5b8185cd-0735-4c1e-a989-8e96ac01ba47",
+      "name": "Webhook1",
+      "webhookId": "dc0cd88a-df51-4c5e-a882-d92d74d7b621"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9c3bb8d2-6060-455a-ab5f-dab5a51402a7",
+              "name": "resposta",
+              "value": "={{ $json.resposta }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        120,
+        -60
+      ],
+      "id": "677bc95b-e754-4de8-93ef-803afb0da51e",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const saidaIA = JSON.parse($json.output || '{}');\n\n// Função para limpar as tags HTML como <span>\nfunction removerTagsHtml(texto) {\n  if (typeof texto !== 'string') return \"\";\n  return texto.replace(/<[^>]*>/g, '').trim();\n}\n\n// Limpa os campos da IA\nconst code = removerTagsHtml(saidaIA.code);\nconst preview = removerTagsHtml(saidaIA.preview);\n\n// Retorna a resposta como JSON em string\nreturn [\n  {\n    json: {\n      resposta: JSON.stringify({\n        code,\n        preview\n      })\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -80,
+        -60
+      ],
+      "id": "d0964bef-bec3-4c3f-9019-50f901b387cf",
+      "name": "Code"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "fb171142-1437-4f85-8ed7-d4b451902abb",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "39151af223a906f37d0e23efdd8044dbb06620f1fa34fa989f8038566d7b6000"
+  },
+  "id": "J0e6be9OC2o26iqM",
+  "tags": []
+}

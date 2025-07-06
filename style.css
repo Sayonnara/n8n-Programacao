@@ -1,0 +1,105 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #04315a;
+    font-family: Arial, Helvetica, sans-serif;
+    height: 100%;
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+main {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.titulo {
+    text-align: center;
+    font-size: 30px;
+    color: #ffff;
+
+    margin: 20px 0px;
+}
+
+h1 {
+    text-align: center;
+    font-size: 25px;
+    color: #111a23;
+    margin-bottom: 20px;
+}
+
+.sessao-maior,
+.sessao-menor {
+    background-color: #e3dee0;
+    border-radius: 8px;
+    width: 100%;
+    height: 500px;
+    padding: 30px;
+
+}
+
+.area-codigo {
+    background-color: #0f1210;
+    height: calc(100% - 80px);
+    border-radius: 8px;
+    padding: 15px;
+    color: white;
+}
+
+.area-resultado {
+    background-color: #6a6a6a;
+    height: calc(100% - 80px);
+    border-radius: 8px;
+    padding: 15px;
+    color: white;
+}
+
+.gerador {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    gap: 5px;
+
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    color: #0a2e4d;
+    border-radius: 6px;
+    border: 2px solid #94a3bb;
+    outline: none;
+
+}
+
+input:focus {
+    border: 2px solid #37e359
+}
+
+button {
+    background-color: #37e359;
+    border: none;
+    padding: 5px 60px;
+    border-radius: 6px;
+    font-size: 20px;
+    color: #f9f9fb;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.5s;
+}
+
+button:hover {
+    background: #00f552;
+}
+
+button:active {
+    transform: scale(0.9);
+}
